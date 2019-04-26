@@ -2,6 +2,7 @@ require 'yaml'
 class Answers
   SKIP_WORD = "skip"
   DOUBLE_WORD = "double"
+  EXIT_WORD = "exit"
 
   def initialize()
     @list = YAML.load_file('answers.yml')
@@ -10,6 +11,7 @@ class Answers
     @point = 0
     @modifier = 1
     @answer = nil
+    @exit = false
   end
 
   def get_list
@@ -18,6 +20,10 @@ class Answers
 
   def has_life
     @point >= 0
+  end
+
+  def exit
+    @exit
   end
 
   def random
@@ -30,7 +36,12 @@ class Answers
   end
 
   def string_shuffle
-    @answer.split("").shuffle.join
+    answer = @answer.split("").shuffle.join
+    hide = @point / 10
+    hide.times do |index|
+      answer[index] = "*"
+    end
+    answer
   end
 
   def skip_word
@@ -41,8 +52,12 @@ class Answers
     DOUBLE_WORD
   end
 
+  def exit_word
+    EXIT_WORD
+  end
+
   def loop_condition(input)
-    ![@answer, SKIP_WORD].include? input
+    ![@answer, SKIP_WORD, EXIT_WORD].include? input
   end
 
   def check_input(input)
@@ -59,6 +74,9 @@ class Answers
     when DOUBLE_WORD
       @modifier = 2
       puts "POINT di double"
+    when EXIT_WORD
+      @exit = true
+      puts "KELUAR dari permainan point anda : #{@point}"
     else
       puts "SALAH! Silakan coba lagi"
     end
